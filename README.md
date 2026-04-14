@@ -2,11 +2,12 @@
 
 This repo is a tiny practice project to learn how to run a frontend + backend with Docker (locally and on an EC2 instance), with data persisted on the server.
 
-## What’s included
+## What's included
 
 - `web`: React (Vite) built into static files and served by Nginx
 - `api`: Node.js + Express REST API
 - `db`: MongoDB 7 with a named Docker volume for persistence
+- `mongo-express`: optional MongoDB web UI (Atlas-like browsing)
 
 Ports (default):
 - Frontend: `http://localhost:3000`
@@ -36,12 +37,26 @@ Notes should still be present (the `db_data` volume is kept).
 
 If you run `docker compose down -v`, it deletes the volume and all data.
 
+## MongoDB UI (Mongo Express)
+
+For EC2 safety, `mongo-express` is bound to `127.0.0.1:8081` on the server, so it is reachable only via SSH tunnel.
+
+1. Start the stack:
+   - `docker compose up -d --build`
+2. From your laptop, create an SSH tunnel:
+   - `ssh -i key.pem -L 8081:localhost:8081 ubuntu@<EC2_PUBLIC_IP>`
+3. Open:
+   - `http://localhost:8081`
+4. Login:
+   - username: `app` (or your `MONGO_USER`)
+   - password: your `MONGO_PASSWORD`
+
 ## Deploy to EC2 (Ubuntu)
 
 Security Group inbound rules:
 - TCP `22` (your IP only)
 - TCP `80` (0.0.0.0/0)
-- TCP `8080` (0.0.0.0/0) for this practice setup
+- TCP `8080` (your IP recommended; 0.0.0.0/0 for practice)
 
 On the EC2 instance:
 
@@ -59,3 +74,4 @@ On the EC2 instance:
 5. Verify:
    - `http://<EC2_PUBLIC_IP>/`
    - `http://<EC2_PUBLIC_IP>:8080/health`
+
